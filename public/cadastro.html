@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadastro</title>
+    <link rel="stylesheet" href="cadastro.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+  </head>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <body>
+    <main>
+      <h2>Cadastro</h2>
+
+      <!-- Aqui vamos mostrar mensagens de erro -->
+      <div id="mensagem" style="color: red; margin-bottom: 10px"></div>
+
+      <form id="formCadastro">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" required /><br /><br />
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required /><br /><br />
+
+        <label for="senha">Senha:</label>
+        <div class="senha-container">
+          <input type="password" id="senha" name="senha" required />
+        </div>
+        <br /><br />
+
+        <label for="confirmarSenha">Confirmar Senha:</label>
+        <div class="senha-container">
+          <input
+            type="password"
+            id="confirmarSenha"
+            name="confirmarSenha"
+            required
+          />
+          <!-- Botão único para mostrar/ocultar senha -->
+          <i class="bi bi-eye toggle-senha" id="toggleSenhas"></i>
+        </div>
+        <br /><br />
+
+        <button type="submit">Cadastrar</button>
+      </form>
+
+      <script>
+        const toggleSenhas = document.getElementById("toggleSenhas");
+        const campoSenha = document.getElementById("senha");
+        const campoConfirmarSenha = document.getElementById("confirmarSenha");
+
+        toggleSenhas.addEventListener("click", () => {
+          const tipoAtual = campoSenha.type;
+          const novoTipo = tipoAtual === "password" ? "text" : "password";
+
+          campoSenha.type = novoTipo;
+          campoConfirmarSenha.type = novoTipo;
+
+          // Troca o ícone do olho
+          toggleSenhas.classList.toggle("bi-eye");
+          toggleSenhas.classList.toggle("bi-eye-slash");
+        });
+
+        // Adiciona o evento de submit ao formulário
+        document
+          .getElementById("formCadastro")
+          .addEventListener("submit", function (event) {
+            event.preventDefault(); // Impede o envio tradicional
+
+            const nome = document.getElementById("nome").value;
+            const email = document.getElementById("email").value;
+            const senha = document.getElementById("senha").value;
+            const confirmarSenha =
+              document.getElementById("confirmarSenha").value;
+            const mensagemDiv = document.getElementById("mensagem");
+
+            // Limpa mensagens antigas
+            mensagemDiv.textContent = "";
+
+            axios
+              .post("http://localhost:8081/cadastro", {
+                nome,
+                email,
+                senha,
+                confirmarSenha,
+              })
+              .then((response) => {
+                alert("Cadastro realizado com sucesso!");
+                console.log(response.data);
+                document.getElementById("formCadastro").reset();
+                window.location.href = "login.html";
+              })
+              .catch((error) => {
+                if (
+                  error.response &&
+                  error.response.data &&
+                  error.response.data.erro
+                ) {
+                  mensagemDiv.textContent = error.response.data.erro;
+                } else {
+                  mensagemDiv.textContent =
+                    "Erro ao cadastrar, tente novamente.";
+                }
+                console.error(error);
+              });
+          });
+      </script>
+    </main>
+  </body>
+</html>

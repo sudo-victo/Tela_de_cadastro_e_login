@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" href="login.css" />
+  </head>
+  <body>
+    <main>
+      <h2>Login</h2>
+      <div id="mensagem" style="color: red; margin-bottom: 10px"></div>
+
+      <form id="formLogin">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required /><br /><br />
+
+        <label for="senha">Senha:</label>
+        <div class="senha-container">
+          <input type="password" id="senha" name="senha" required />
+          <i class="bi bi-eye toggle-senha" id="toggleSenha"></i>
+        </div>
+        <br />
+
+        <button type="submit">Entrar</button>
+      </form>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      const toggleSenha = document.getElementById("toggleSenha");
+      const campoSenha = document.getElementById("senha");
+
+      toggleSenha.addEventListener("click", () => {
+        const tipoAtual = campoSenha.type;
+        const novoTipo = tipoAtual === "password" ? "text" : "password";
+
+        campoSenha.type = novoTipo;
+        toggleSenha.classList.toggle("bi-eye");
+        toggleSenha.classList.toggle("bi-eye-slash");
+      });
+
+      document
+        .getElementById("formLogin")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          const email = document.getElementById("email").value;
+          const senha = document.getElementById("senha").value;
+          const mensagemDiv = document.getElementById("mensagem");
+
+          mensagemDiv.textContent = "";
+
+          axios
+            .post("http://localhost:8081/login", {
+              email,
+              senha,
+            })
+            .then((response) => {
+              alert("Login realizado com sucesso!");
+              console.log(response.data);
+              document.getElementById("formLogin").reset();
+            })
+            .catch((error) => {
+              if (
+                error.response &&
+                error.response.data &&
+                error.response.data.erro
+              ) {
+                mensagemDiv.textContent = error.response.data.erro;
+              } else {
+                mensagemDiv.textContent =
+                  "Erro ao fazer login, tente novamente.";
+              }
+              console.error(error);
+            });
+        });
+    </script>
+  </body>
+</html>
